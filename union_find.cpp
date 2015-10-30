@@ -12,7 +12,7 @@ class UnionFind
             parent = new int[n];
             for(int i = 0; i < n; i++)
             {
-                rank[i] = 0;
+                rank[i] = 1;
                 parent[i] = i;
             }
         }
