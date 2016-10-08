@@ -3,34 +3,23 @@
 using namespace std;
 
 
-//There is bug in this implementation somwhere
 class LCA
 {
 public:
-    LCA(int root, const vector<int> &tree)
-        : root(root), tree(tree)
+    LCA(int root, const vector<int> &tree, const vector<int> &level)
+        : root(root),level(level), tree(tree)
     {
-        size_t logn = 1;
-        size_t p = 1;
-        this->tree[root] = -1;
-        while(p <= tree.size())
-        {
-            p *= 2;
-            logn++;
-        }
-
-        lca_pre.resize(tree.size());
-        level.resize(tree.size(),0);
-
-        for(size_t i = 0; i < lca_pre.size(); i++)
-        {
-            lca_pre[i].resize(logn, root);
-        }
-
-        compute_levels();
+        initialize();
         preprocess();
     }
 
+    LCA(int root, const vector<int> &tree)
+        : root(root), tree(tree)
+    {
+        initialize();
+        compute_levels();
+        preprocess();
+    }
     
     size_t query(int p, int q)
     {
@@ -62,8 +51,28 @@ public:
         return tree[p];
     }
 
-
 private:
+    void initialize()
+    {
+        size_t logn = 1;
+        size_t p = 1;
+
+        tree[root] = -1;
+
+        while(p <= tree.size())
+        {
+            p *= 2;
+            logn++;
+        }
+
+        lca_pre.resize(tree.size());
+
+        for(size_t i = 0; i < lca_pre.size(); i++)
+        {
+            lca_pre[i].resize(logn, root);
+        }
+    }
+
     void preprocess()
     {
         for(size_t i = 0; i < lca_pre.size(); i++)
@@ -72,7 +81,7 @@ private:
         }
         size_t logn = lca_pre[0].size();
         for(size_t p = 1; p < logn; p++)
-            for(size_t i = 0; i < lca_pre[i].size(); i++)
+            for(size_t i = 0; i < lca_pre.size(); i++)
             {
                 if(lca_pre[i][p-1] >= 0)
                 {
@@ -85,8 +94,10 @@ private:
             }
     }
 
+    //Careful!, this might cause stack overflows
     void compute_levels()
     {
+        level.resize(tree.size(),0);
         level[root] = 1;
         for(size_t i = 0; i < tree.size(); i++)
             if(level[i] == 0)
@@ -112,7 +123,7 @@ private:
 int main()
 {
     vector<int> tree(9,0);
-    tree[0] = -1;
+    tree[0] = 0;
     tree[1] = 0;
     tree[2] = 1;
     tree[3] = 2;
